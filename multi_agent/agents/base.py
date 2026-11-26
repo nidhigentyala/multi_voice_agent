@@ -1,3 +1,4 @@
+
 from livekit.agents import Agent, RunContext, function_tool
 
 COMMON_RULES = """
@@ -16,19 +17,23 @@ class BaseSpecialist(Agent):
     greeting: str = ""
 
     def __init__(self, **kwargs):
-        super().__init__(instructions=COMMON_RULES + "\n" + self.prompt, **kwargs)
+        super().__init__(
+            instructions=COMMON_RULES + "\n" + self.prompt,
+            **kwargs
+        )
 
     async def on_enter(self):
-        # Runs when this agent takes over the call.
-        self.session.generate_reply(instructions=self.greeting)
+        if self.greeting:
+            await self.session.generate_reply(
+                instructions=self.greeting
+            )
 
     @function_tool
     async def back_to_menu(self, context: RunContext):
         """Use when the user wants a different service, or is finished with this one."""
-        # Imported here to avoid a circular import with the supervisor.
         from multi_agent.supervisor.agent import SupervisorAgent
 
-        return (
-            SupervisorAgent(returning=True, chat_ctx=self.chat_ctx),
-            "Taking you back to the main menu.",
+        return SupervisorAgent(
+            returning=True,
+            chat_ctx=self.chat_ctx,
         )

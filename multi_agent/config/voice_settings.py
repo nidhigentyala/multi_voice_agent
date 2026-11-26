@@ -5,9 +5,14 @@ VOICE_SETTINGS = {
         "mode": "transcribe",
     },
     "tts": {
-        "model": "bulbul:v3",
-        "target_language_code": "en-IN",
-        "speaker": "ishita",
+        "provider": "cartesia",
+        "model": "sonic-3",
+        "language": "en",
+        "speed": 1.0,
+         "voices": {
+            "supervisor": "39d518b7-fd0b-4676-9b8b-29d64ff31e12",
+            "airline": "f786b574-daa5-4673-aa0c-cbe3e8534c02",
+        },
     },
     "endpointing": {
         "mode": "dynamic",

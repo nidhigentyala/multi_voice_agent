@@ -1,5 +1,6 @@
 from livekit.agents import Agent, RunContext, function_tool
 
+from multi_agent.agents.airline import AirlineAgent
 from multi_agent.agents.bank import BankAgent
 from multi_agent.agents.clinic import ClinicAgent
 from multi_agent.agents.interview import InterviewAgent
@@ -19,11 +20,11 @@ class SupervisorAgent(Agent):
 
     async def on_enter(self):
         if self._returning:
-            # Back from another service: let the LLM decide, in case the user already asked for something.
-            self.session.generate_reply(instructions=GREETING_RETURNING)
+            await self.session.generate_reply(
+                instructions=GREETING_RETURNING
+            )
         else:
-            # First greeting: fixed text, speaks immediately.
-            self.session.say(GREETING_TEXT)
+            await self.session.say(GREETING_TEXT)
 
     @function_tool
     async def transfer_to_restaurant(self, context: RunContext):
@@ -49,3 +50,11 @@ class SupervisorAgent(Agent):
     async def transfer_to_interview(self, context: RunContext):
         """Use when the user wants a practice interview or a resume-based interview."""
         return InterviewAgent(chat_ctx=self.chat_ctx), "Connecting to the interview assistant."
+
+    @function_tool
+    async def transfer_to_airline(self, context: RunContext):
+        """Use when the user wants to book, change or cancel a flight, check flight status, or asks about airline baggage or check-in."""
+        return AirlineAgent(
+            chat_ctx=self.chat_ctx,
+            greet=True,
+        ), "Connecting to the airline assistant."

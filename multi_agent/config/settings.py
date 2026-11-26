@@ -3,6 +3,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from livekit.plugins import openai, sarvam
+from livekit.plugins import cartesia
 
 from multi_agent.config.voice_settings import VOICE_SETTINGS
 
@@ -24,8 +25,12 @@ def build_llm():
     return openai.LLM(model=LLM_MODEL)
 
 
-def build_tts(speaker: str | None = None):
-    cfg = dict(VOICE_SETTINGS["tts"])
-    if speaker:
-        cfg["speaker"] = speaker  # per-agent voice override
-    return sarvam.TTS(**cfg)
+def build_tts(voice_id: str):
+    tts_settings = VOICE_SETTINGS["tts"]
+
+    return cartesia.TTS(
+        model=tts_settings["model"],
+        voice=voice_id,
+        language=tts_settings["language"],
+        speed=tts_settings["speed"],
+    )
